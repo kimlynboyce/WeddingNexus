@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,6 +20,9 @@
         #music-control-box { margin: 20px auto; padding: 15px; border: 2px dashed var(--gold); border-radius: 15px; display: inline-block; cursor: pointer; background: white; width: 80%; max-width: 300px; }
         .mobile-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--emerald); display: flex; justify-content: space-around; padding: 15px 0; border-top: 2px solid var(--gold); z-index: 1000; }
         .mobile-nav a { color: var(--gold); text-decoration: none; font-weight: bold; font-size: 0.8rem; }
+        @media (max-width: 600px) {
+            .qr-section { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -70,7 +73,7 @@
     </form>
 </section>
 
-<section class="container">
+<section class="container qr-section">
     <h2>Share the Vibe</h2>
     <img src='/qr' style='width:150px; border:5px solid var(--gold); border-radius:10px;'><br>
     <small>Scan to share this link</small>
