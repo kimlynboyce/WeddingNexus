@@ -7,59 +7,32 @@
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Great+Vibes&display=swap');
         :root { --emerald: #046307; --gold: #D4AF37; --white: #FFFFFF; --camel: #C19A6B; }
         body { margin: 0; font-family: 'Playfair Display', serif; background: var(--white); background-image: url('https://img.magnific.com/premium-vector/wedding-background-with-hand-drawn-floral-ornaments_1215-320.jpg?w=900'); background-size: cover; background-attachment: fixed; background-position: center; color: #333; overflow-x: hidden; padding-bottom: 80px; }
-        
-        .container { max-width: 95% !important; width: 800px; margin: 20px auto; padding: 20px; background: rgba(255,255,255,0.95); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; }
+        .container { max-width: 95%; width: 800px; margin: 20px auto; padding: 20px; background: rgba(255,255,255,0.95); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; }
         header { background: var(--emerald); padding: 40px 20px; text-align: center; border-bottom: 5px solid var(--gold); }
         .names { font-family: 'Great Vibes', cursive; font-size: clamp(2.5rem, 10vw, 5rem); color: var(--gold); margin: 0; }
         .sub-header { color: var(--white); letter-spacing: 5px; font-size: 1.2rem; margin-top: 15px; font-weight: bold; }
-        
-        button { background: linear-gradient(135deg, var(--gold), var(--camel)); color: white; border: none; padding: 15px 30px; font-size: 1rem; font-weight: bold; cursor: pointer; border-radius: 50px; text-transform: uppercase; max-width: 100%; }
-        
-        /* Tightened Timer */
-        .time-box { background: var(--emerald); color: var(--gold); padding: 8px; border-radius: 8px; min-width: 55px; flex: none; margin: 2px; }
-        .time-box span { display: block; font-size: 1.3rem; font-weight: bold; }
-        
-        .timeline { position: relative; margin: 20px 0; }
+        button { background: linear-gradient(135deg, var(--gold), var(--camel)); color: white; border: none; padding: 15px 30px; font-size: 1rem; font-weight: bold; cursor: pointer; border-radius: 50px; text-transform: uppercase; }
+        .time-box { background: var(--emerald); color: var(--gold); padding: 8px; border-radius: 8px; min-width: 55px; margin: 2px; }
+        .time-box span { display: block; font-size: 1.5rem; font-weight: bold; }
         .timeline-item { width: 100%; margin: 10px 0; padding: 15px; background: white; border-radius: 10px; border: 1px solid var(--gold); box-sizing: border-box; }
-        
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 20px; }
         .gallery-item img { width: 100%; height: 150px; object-fit: cover; border-radius: 10px; border: 2px solid var(--gold); }
-        
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border: 3px solid var(--gold); border-radius: 15px; margin: 20px 0; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        
         .mobile-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--emerald); display: flex; justify-content: space-around; padding: 15px 0; border-top: 2px solid var(--gold); z-index: 1000; }
         .mobile-nav a { color: var(--gold); text-decoration: none; font-weight: bold; font-size: 0.8rem; }
-
         #music-control-box { margin: 20px auto; padding: 15px; border: 2px dashed var(--gold); border-radius: 15px; display: inline-block; cursor: pointer; background: white; width: 80%; max-width: 300px; }
-        #music-control-box:hover { background: #fffdf0; }
-        
-        @media (min-width: 600px) {
-            .time-box { min-width: 70px; margin: 5px; }
-            .time-box span { font-size: 2rem; }
-            .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-        }
     </style>
 </head>
 <body>
-
 <header><h1 class="names">Nicholas & Christine</h1><p class="sub-header">MAY 30, 2027</p></header>
 
 <section class="container">
     <button onclick='raiseToast()' id='toastBtn'>🥂 TOAST THE COUPLE</button>
     <p id='toastCount' style='font-weight:bold; color:var(--emerald); margin-top:10px;'>0 Toasts Raised</p>
-    <div id="countdown" style="display:flex; justify-content:center; margin-top:20px; flex-wrap: nowrap; gap: 4px;">
+    <div id="countdown" style="display:flex; justify-content:center; margin-top:20px; flex-wrap: wrap;">
         <div class="time-box"><span id="days">00</span>DAYS</div>
         <div class="time-box"><span id="hours">00</span>HRS</div>
         <div class="time-box"><span id="minutes">00</span>MIN</div>
         <div class="time-box"><span id="seconds">00</span>SEC</div>
-    </div>
-</section>
-
-<section class="container">
-    <h2>Live Ceremony</h2>
-    <div class="video-container">
-        <iframe src="https://www.youtube.com/embed/live_stream?channel=YOUR_CHANNEL_ID" frameborder="0" allowfullscreen></iframe>
     </div>
 </section>
 
@@ -78,14 +51,17 @@
     <div id="memoryGrid" class="gallery-grid"></div>
 </section>
 
+<section class="container">
+    <h2>Requested Playlist</h2>
+    <div id="songFeed" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;"></div>
+</section>
+
 <section class="container" id="rsvp-section">
     <h2>Kindly RSVP</h2>
-    
     <div id="music-control-box" onclick="toggleMusic()">
         <span id="musicBtn" style="font-size: 2rem;">🎵</span><br>
         <small id="musicLabel">CLICK TO PLAY MUSIC</small>
     </div>
-
     <form onsubmit="submitRSVP(event)" style="text-align:left; max-width:400px; margin:20px auto;">
         <input type="text" name="guest_name" required placeholder="Your Name" style="width:100%; padding:12px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;"><br>
         <select name="attendance" style="width:100%; padding:12px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;"><option value="yes">Accepts with Pleasure</option><option value="no">Declines with Regret</option></select><br>
@@ -101,39 +77,20 @@
     <a href="/login">ADMIN</a>
 </div>
 
-<!-- Autoplay set via JS to handle browser restrictions -->
 <audio id="bgMusic" loop preload="auto"><source src="https://stream.radio.co/s9f46a9bb1/listen?ver=539744" type="audio/mpeg"></audio>
 
 <script>
-        function startTimer() {
-        const targetDate = new Date(2027, 4, 30, 13, 0, 0); // May 30, 2027, 1:00 PM
-        const target = targetDate.getTime();
-        
-        function update() {
+    function startTimer() {
+        const target = new Date(2027, 4, 30, 13, 0, 0).getTime();
+        setInterval(() => {
             const now = new Date().getTime();
             const diff = target - now;
-            
-            if (isNaN(diff) || diff < 0) {
-                document.getElementById('days').innerText = '00';
-                document.getElementById('hours').innerText = '00';
-                document.getElementById('minutes').innerText = '00';
-                document.getElementById('seconds').innerText = '00';
-                return;
-            }
-            
-            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            document.getElementById('days').innerText = d.toString().padStart(2, '0');
-            document.getElementById('hours').innerText = h.toString().padStart(2, '0');
-            document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
-            document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
-        }
-        
-        update(); // Initial call
-        setInterval(update, 1000);
+            if (isNaN(diff) || diff < 0) return;
+            document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+            document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+        }, 1000);
     }
 
     let playing = false;
@@ -142,13 +99,8 @@
         const b = document.getElementById('musicBtn');
         const l = document.getElementById('musicLabel');
         if(!playing) { 
-            a.play().then(() => { 
-                b.innerText = '⏸'; 
-                l.innerText = 'MUSIC IS PLAYING';
-                playing = true; 
-            }).catch(e => { 
-                console.log('Autoplay blocked. User interaction required.');
-            }); 
+            a.play().then(() => { b.innerText = '⏸'; l.innerText = 'MUSIC IS PLAYING'; playing = true; })
+            .catch(e => { alert('Please click again to start music.'); }); 
         }
         else { a.pause(); b.innerText = '🎵'; l.innerText = 'CLICK TO RESUME'; playing = false; }
     }
@@ -162,8 +114,10 @@
     async function submitRSVP(e) {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(e.target).entries());
-        const r = await fetch('/api/rsvp', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
-        if(r.ok) { alert('Thank you! RSVP recorded.'); e.target.reset(); }
+        await fetch('/api/rsvp', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+        alert('Thank you! RSVP recorded.');
+        e.target.reset();
+        loadSongs();
     }
 
     async function loadMemories() {
@@ -173,13 +127,16 @@
         if(g) g.innerHTML = d.map(m => <div class='gallery-item'><img src='/static/uploads/'></div>).join('');
     }
 
-    window.onload = () => {
-        startTimer(); loadMemories();
-        fetch('/api/toasts').then(r => r.json()).then(d => document.getElementById('toastCount').innerText = d.toasts + ' Toasts Raised');
-        
-        // Attempt autoplay after a small delay
-        setTimeout(() => { toggleMusic(); }, 1000);
+    async function loadSongs() {
+        const r = await fetch('/api/songs');
+        const d = await r.json();
+        const f = document.getElementById('songFeed');
+        if(f) f.innerHTML = d.map(s => <div style='background:var(--camel); color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem;'><b></b> ()</div>).join('');
+    }
 
+    window.onload = () => {
+        startTimer(); loadMemories(); loadSongs();
+        fetch('/api/toasts').then(r => r.json()).then(d => document.getElementById('toastCount').innerText = d.toasts + ' Toasts Raised');
         document.getElementById('photoInput').onchange = async (e) => {
             if(!e.target.files[0]) return;
             const fd = new FormData(); fd.append('file', e.target.files[0]);
@@ -190,4 +147,3 @@
 </script>
 </body>
 </html>
-
