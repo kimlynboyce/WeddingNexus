@@ -1,9 +1,8 @@
 ﻿from flask import Flask, render_template, request, jsonify, send_file
-import sqlite3, os, subprocess, qrcode
-from io import BytesIO
+import sqlite3, os, subprocess, csv, io
 
 app = Flask(__name__)
-DB_PATH = '/opt/render/project/src/database.db' if os.environ.get('RENDER') else 'database.db'
+DB_PATH = 'database.db'
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -30,56 +29,42 @@ def index(): return render_template('index.html')
 @app.route('/api/rsvp', methods=['POST'])
 def rsvp():
     data = request.json
-    name, att = data.get('guest_name'), data.get('attendance')
+    name, att, meal, song, notes = data.get('guest_name'), data.get('attendance'), data.get('meal'), data.get('song'), data.get('notes')
     conn = sqlite3.connect(DB_PATH)
-    conn.execute("INSERT INTO guests (name, attendance, meal, song, notes) VALUES (?, ?, ?, ?, ?)", (name, att, data.get('meal'), data.get('song'), data.get('notes')))
+    conn.execute("INSERT INTO guests (name, attendance, meal, song, notes) VALUES (?, ?, ?, ?, ?)", (name, att, meal, song, notes))
     conn.commit()
     conn.close()
-    trigger_phone_ping(f"RSVP: {name} is {att}!")
+    trigger_phone_ping(f"RSVP: {name}")
     return jsonify({"success": True})
 
-@app.route('/api/comment', methods=['POST'])
-def add_comment():
-    data = request.json
-    name, msg = data.get('name'), data.get('message')
+@app.route('/api/songs')
+def get_songs():
     conn = sqlite3.connect(DB_PATH)
-    conn.execute("INSERT INTO guestbook (name, message) VALUES (?, ?)", (name, msg))
-    conn.commit()
+    songs = conn.execute("SELECT name, song FROM guests WHERE song != '' ORDER BY id DESC").fetchall()
     conn.close()
-    trigger_phone_ping(f"Note from {name}")
-    return jsonify({"success": True})
-
-@app.route('/api/comments')
-def get_comments():
-    conn = sqlite3.connect(DB_PATH)
-    comments = conn.execute("SELECT name, message, timestamp FROM guestbook ORDER BY timestamp DESC").fetchall()
-    conn.close()
-    return jsonify([{"name": c[0], "message": c[1], "time": c[2]} for c in comments])
-
-@app.route('/qr')
-def get_qr():
-    img = qrcode.make("http://192.168.100.132:5000")
-    buf = BytesIO()
-    img.save(buf)
-    buf.seek(0)
-    return send_file(buf, mimetype='image/png')
+    return jsonify([{"name": s[0], "song": s[1]} for s in songs])
 
 @app.route('/master-view/<pin>')
 def admin(pin):
     if pin != '1234': return 'UNAUTHORIZED', 401
     conn = sqlite3.connect(DB_PATH)
     guests = conn.execute("SELECT * FROM guests").fetchall()
-    stats = conn.execute("SELECT attendance, COUNT(*) FROM guests GROUP BY attendance").fetchall()
-    comments = conn.execute("SELECT name, message FROM guestbook ORDER BY timestamp DESC").fetchall()
     conn.close()
-    stat_html = "<h3>Stats</h3><ul>"
-    for s in stats: stat_html += f"<li>{s[0].upper()}: {s[1]}</li>"
-    stat_html += "</ul>"
-    html = f"<html><body><h1>Master Control</h1>{stat_html}<table border='1'><tr><th>Name</th><th>Status</th></tr>"
-    for g in guests: html += f"<tr><td>{g[1]}</td><td>{g[2]}</td></tr>"
-    html += "</table><h2>Messages</h2><ul>"
-    for c in comments: html += f"<li><b>{c[0]}:</b> {c[1]}</li>"
-    return html + "</ul></body></html>"
+    html = f"<html><body style='font-family:sans-serif;padding:20px;'><h1>Admin Hub</h1><a href='/export-csv/1234'>DOWNLOAD CSV</a><br><br><table border='1'><tr><th>Name</th><th>Status</th><th>Meal</th><th>Song</th></tr>"
+    for g in guests: html += f"<tr><td>{g[1]}</td><td>{g[2]}</td><td>{g[3]}</td><td>{g[4]}</td></tr>"
+    return html + "</table><br><a href='/'>Back</a></body></html>"
+
+@app.route('/export-csv/<pin>')
+def export_csv(pin):
+    if pin != '1234': return 'UNAUTHORIZED', 401
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.execute("SELECT * FROM guests")
+    si = io.StringIO()
+    cw = csv.writer(si)
+    cw.writerow([d[0] for d in cursor.description])
+    cw.writerows(cursor.fetchall())
+    output = io.BytesIO(si.getvalue().encode('utf-8'))
+    return send_file(output, mimetype='text/csv', as_attachment=True, download_name='rsvps.csv')
 
 if __name__ == '__main__':
     init_db()

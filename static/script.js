@@ -91,3 +91,17 @@ loadComments();
 function scrollToRSVP() {
     document.getElementById('rsvp-section').scrollIntoView({behavior: 'smooth'});
 }
+
+async function loadSongs() {
+    try {
+        const res = await fetch('/api/songs');
+        const data = await res.json();
+        const feed = document.getElementById('songFeed');
+        if(feed) {
+            feed.innerHTML = data.map(s => \<div style='background:var(--camel); color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem;'><b>\</b> <small>(\)</small></div>\).join('');
+        }
+    } catch(e) {}
+}
+// Add to load sequence
+const oldLoad = window.onload;
+window.onload = () => { if(oldLoad) oldLoad(); loadSongs(); };
