@@ -11,6 +11,7 @@
     <p class="sub-header">ARE GETTING MARRIED</p>
 </header>
 <section class="hero"><div class="container">
+    <div class="waveform-container" id="waveform"></div>
     <h2>Save the Date</h2><p>May 30, 2027 • 1:00 PM • Indian Arrival Day</p>
     <div id="countdown">
         <div class="time-box"><span id="days">00</span><label>Days</label></div>
@@ -25,24 +26,28 @@
 </div></section>
 <section class="container">
     <h2>Memory Wall</h2>
-    <p>Upload a photo for our wedding album.</p>
     <input type="file" id="photoInput" style="display:none">
-    <button onclick="document.getElementById('photoInput').click()">SELECT PHOTO</button>
+    <button onclick="document.getElementById('photoInput').click()">UPLOAD PHOTO</button>
     <div id="memoryGrid" class="gallery-grid" style="margin-top:20px"></div>
+</section>
+<section class="container">
+    <h2>Guest Book</h2>
+    <div class="rsvp-card">
+        <input type="text" id="gbName" placeholder="Your Name" style="width:100%;padding:10px;margin-bottom:10px;border-radius:5px;border:1px solid #ccc;"><br>
+        <textarea id="gbMsg" placeholder="Leave a message for the couple..." style="width:100%;padding:10px;margin-bottom:10px;border-radius:5px;border:1px solid #ccc;"></textarea>
+        <button onclick="submitComment()">POST MESSAGE</button>
+        <div id="commentList" style="margin-top:20px; text-align:left; max-height:300px; overflow-y:auto;"></div>
+    </div>
 </section>
 <section class="container" id="rsvp-section">
     <h2>Kindly RSVP</h2>
     <div class="rsvp-card"><form onsubmit="submitRSVP(event)">
         <input type="text" name="guest_name" required placeholder="Guest Name"><br><br>
-        <select name="attendance"><option value="yes">Accepts</option><option value="no">Declines</option></select><br><br>
+        <select name="attendance"><option value="yes">Accepts with Pleasure</option><option value="no">Declines with Regret</option></select><br><br>
+        <input type="text" name="meal" placeholder="Meal Preference / Allergies"><br><br>
+        <input type="text" name="song" placeholder="Song Request"><br><br>
         <button type="submit">SUBMIT RSVP</button>
     </form></div>
-</section>
-<section class="container">
-    <h2>Location</h2>
-    <div class="video-container" style="background:#222; color:white; display:flex; align-items:center; justify-content:center;">
-        <p>[Google Maps Substrate - Trinidad]</p>
-    </div>
 </section>
 <footer><p>© 2027 Nicholas & Christine | Built by Cyrus</p></footer>
 <script src="/static/script.js"></script>

@@ -301,3 +301,21 @@ footer {
     color: var(--camel);
     font-size: 0.9rem;
 }
+.waveform-container { height: 60px; display: flex; align-items: center; justify-content: center; gap: 3px; margin: 20px 0; }
+.bar { width: 4px; height: 10px; background: var(--gold); transition: height 0.1s ease; border-radius: 2px; }
+
+.waveform-container { height: 60px; display: flex; align-items: center; justify-content: center; gap: 3px; margin: 20px 0; }
+.bar { width: 4px; height: 10px; background: #D4AF37; transition: height 0.1s ease; border-radius: 2px; }
+
+/* Timeline Styles */
+.timeline { position: relative; max-width: 800px; margin: 40px auto; padding: 20px 0; }
+.timeline::after { content: ''; position: absolute; width: 4px; background: var(--gold); top: 0; bottom: 0; left: 50%; margin-left: -2px; }
+.timeline-item { padding: 10px 40px; position: relative; background: inherit; width: 50%; box-sizing: border-box; }
+.timeline-item::after { content: ''; position: absolute; width: 20px; height: 20px; right: -10px; background: var(--white); border: 4px solid var(--emerald); top: 15px; border-radius: 50%; z-index: 1; }
+.left { left: 0; text-align: right; }
+.right { left: 50%; }
+.right::after { left: -10px; }
+.timeline-content { padding: 20px; background: rgba(255,255,255,0.9); border-radius: 10px; border: 1px solid var(--camel); }
+
+/* Music Player Toggle */
+.music-toggle { position: fixed; bottom: 20px; right: 20px; background: var(--emerald); color: var(--gold); padding: 15px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1000; }

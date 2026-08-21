@@ -59,3 +59,31 @@ async function loadMemories() {
     grid.innerHTML = data.map(m => \<div class='gallery-item'><img src='\' title='\'></div>\).join('');
 }
 loadMemories();
+function animateWave() {
+    const bars = document.querySelectorAll('.bar');
+    bars.forEach(bar => {
+        const h = 10 + Math.random() * 40;
+        bar.style.height = h + 'px';
+        bar.style.opacity = h / 50;
+    });
+}
+setInterval(animateWave, 150);
+async function submitComment() {
+    const name = document.getElementById('gbName').value;
+    const message = document.getElementById('gbMsg').value;
+    if(!name || !message) return alert('Please fill in both fields');
+    await fetch('/api/comment', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name, message})
+    });
+    document.getElementById('gbMsg').value = '';
+    loadComments();
+}
+async function loadComments() {
+    const res = await fetch('/api/comments');
+    const data = await res.json();
+    const list = document.getElementById('commentList');
+    list.innerHTML = data.map(c => \<div style='border-bottom:1px solid #eee; padding:10px;'><b>\:</b> \<br><small style='color:gray'>\</small></div>\).join('');
+}
+loadComments();
