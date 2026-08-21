@@ -24,18 +24,19 @@ def init_db():
 init_db()
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+def index(): return render_template('index.html')
 
 @app.route('/api/rsvp', methods=['POST'])
 def rsvp():
     d = request.json
-    conn = sqlite3.connect(DB_PATH)
-    conn.execute("INSERT INTO guests (name, attendance, meal, song, notes) VALUES (?, ?, ?, ?, ?)", 
-                 (d.get('guest_name'), d.get('attendance'), d.get('meal'), d.get('song'), d.get('notes')))
-    conn.commit()
-    conn.close()
-    return jsonify({"success": True})
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute("INSERT INTO guests (name, attendance, meal, song, notes) VALUES (?, ?, ?, ?, ?)", 
+                     (d.get('guest_name'), d.get('attendance'), d.get('meal'), d.get('song'), d.get('notes')))
+        conn.commit()
+        conn.close()
+        return jsonify({"success": True})
+    except: return jsonify({"success": False}), 500
 
 @app.route('/api/toast', methods=['POST'])
 def add_toast():
@@ -55,7 +56,7 @@ def get_toasts():
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
-    if 'file' not in request.files: return jsonify({"success": False}), 400
+    if 'file' not in request.files: return "No file", 400
     file = request.files['file']
     if file.filename:
         filename = secure_filename(file.filename)
@@ -72,6 +73,13 @@ def get_memories():
     mems = conn.execute("SELECT filename FROM memories ORDER BY id DESC").fetchall()
     conn.close()
     return jsonify([{"filename": m[0]} for m in mems])
+
+@app.route('/api/songs')
+def get_songs():
+    conn = sqlite3.connect(DB_PATH)
+    songs = conn.execute("SELECT name, song FROM guests WHERE song != '' ORDER BY id DESC").fetchall()
+    conn.close()
+    return jsonify([{"name": s[0], "song": s[1]} for s in songs])
 
 @app.route('/qr')
 def get_qr():
@@ -100,4 +108,4 @@ def admin_hub():
     return render_template('admin.html', guests=guests, toasts=toasts)
 
 if __name__ == '__main__':
-    app.run(debug=False, port=5000)
+    app.run(debug=False, port=5000, host='0.0.0.0')
