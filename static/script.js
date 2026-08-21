@@ -87,3 +87,7 @@ async function loadComments() {
     list.innerHTML = data.map(c => \<div style='border-bottom:1px solid #eee; padding:10px;'><b>\:</b> \<br><small style='color:gray'>\</small></div>\).join('');
 }
 loadComments();
+
+function scrollToRSVP() {
+    document.getElementById('rsvp-section').scrollIntoView({behavior: 'smooth'});
+}
