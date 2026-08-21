@@ -8,17 +8,25 @@
 <body>
 <div class="floating-flower" style="top:10%; left:5%; width:50px; height:50px; background:rgba(212,175,55,0.1); border-radius:50%; filter:blur(20px);"></div>
 <div class="floating-flower" style="top:70%; right:10%; width:80px; height:80px; background:rgba(4,99,7,0.1); border-radius:50%; filter:blur(30px); animation-delay: 2s;"></div>
+
 <header>
     <h1 class="names">Nicholas & Christine</h1>
     <p class="sub-header">ARE GETTING MARRIED</p>
 </header>
+
 <section class="hero"><div class="container">
-    <div class="waveform-container" id="waveform"></div>
     <div style='text-align:center; margin:40px 0;'>
-    <button onclick='raiseToast()' id='toastBtn' style='font-size:2rem; padding:20px 40px; border-radius:100px; background:linear-gradient(var(--gold), var(--camel));'>🥂 TOAST THE COUPLE</button>
-    <p id='toastCount' style='font-weight:bold; color:var(--emerald); margin-top:10px;'>0 Toasts Raised</p>
-</div>
-<h2>Save the Date</h2><p>May 30, 2027 • 1:00 PM • Indian Arrival Day</p>
+        <button onclick='raiseToast()' id='toastBtn' style='font-size:2rem; padding:20px 40px; border-radius:100px; background:linear-gradient(#D4AF37, #C19A6B); color: black; border:none; cursor:pointer;'>🥂 TOAST THE COUPLE</button>
+        <p id='toastCount' style='font-weight:bold; color:#046307; margin-top:10px;'>0 Toasts Raised</p>
+    </div>
+    <div class="waveform-container" id="waveform">
+        <div class='bar'></div><div class='bar'></div><div class='bar'></div><div class='bar'></div><div class='bar'></div>
+        <div class='bar'></div><div class='bar'></div><div class='bar'></div><div class='bar'></div><div class='bar'></div>
+        <div class='bar'></div><div class='bar'></div><div class='bar'></div><div class='bar'></div><div class='bar'></div>
+        <div class='bar'></div><div class='bar'></div><div class='bar'></div><div class='bar'></div><div class='bar'></div>
+    </div>
+    <h2>Save the Date</h2>
+    <p>May 30, 2027 • 1:00 PM • Indian Arrival Day</p>
     <div id="countdown">
         <div class="time-box"><span id="days">00</span><label>Days</label></div>
         <div class="time-box"><span id="hours">00</span><label>Hours</label></div>
@@ -26,69 +34,62 @@
         <div class="time-box"><span id="seconds">00</span><label>Seconds</label></div>
     </div>
 </div></section>
+
 <section class="container">
     <h2>Our Journey</h2>
     <div class="timeline">
-        <div class="timeline-item left"><div class="timeline-content"><h3>Meeting</h3><p>Day 1.</p></div></div>
-        <div class="timeline-item right"><div class="timeline-content"><h3>Proposal</h3><p>The Yes.</p></div></div>
+        <div class="timeline-item left"><div class="timeline-content"><h3>The First Meeting</h3><p>Where it all began.</p></div></div>
+        <div class="timeline-item right"><div class="timeline-content"><h3>The Proposal</h3><p>A moment we'll never forget.</p></div></div>
+        <div class="timeline-item left"><div class="timeline-content"><h3>Wedding Day</h3><p>May 30, 2027</p></div></div>
     </div>
 </section>
+
+<section class="container">
+    <h2>Memory Wall</h2>
+    <input type="file" id="photoInput" style="display:none">
+    <button onclick="document.getElementById('photoInput').click()">UPLOAD PHOTO</button>
+    <div id="memoryGrid" class="gallery-grid" style="margin-top:20px"></div>
+</section>
+
 <section class="container">
     <h2>Requested Playlist</h2>
-    <p>Songs our guests want to hear:</p>
     <div id="songFeed" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;"></div>
 </section>
+
 <section class="container" id="rsvp-section">
     <h2>Kindly RSVP</h2>
     <div class="rsvp-card"><form onsubmit="submitRSVP(event)">
-        <input type="text" name="guest_name" required placeholder="Name"><br><br>
-        <select name="attendance"><option value="yes">Yes</option><option value="no">No</option></select><br><br>
-        <button type="submit">SUBMIT</button>
+        <input type="text" name="guest_name" required placeholder="Name" style="width:100%; padding:10px; margin-bottom:10px;"><br>
+        <select name="attendance" style="width:100%; padding:10px; margin-bottom:10px;"><option value="yes">Yes</option><option value="no">No</option></select><br>
+        <input type="text" name="meal" placeholder="Meal Preference" style="width:100%; padding:10px; margin-bottom:10px;"><br>
+        <input type="text" name="song" placeholder="Song Request" style="width:100%; padding:10px; margin-bottom:10px;"><br>
+        <button type="submit">SUBMIT RSVP</button>
     </form></div>
 </section>
-<div class="music-toggle" onclick="toggleMusic()" id="musicBtn">🎵</div>
-<audio id="bgMusic" loop><source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg"></audio>
-<section class="container">
-    <section class="container">
-    <h2>The Wedding Party</h2>
-    <div class="party-grid">
-        <div class="party-card"><img src="https://via.placeholder.com/150?text=Best+Man"><h4>The Best Man</h4><p>Groom's Side</p></div>
-        <div class="party-card"><img src="https://via.placeholder.com/150?text=Maid+of+Honor"><h4>Maid of Honor</h4><p>Bride's Side</p></div>
-    </div>
-</section>
-<section class="container">
-    <h2>Travel & Stay</h2>
-    <div class="travel-box">
-        <h3>Recommended Hotels</h3>
-        <p>• Hyatt Regency Trinidad<br>• Hilton Trinidad & Conference Centre</p>
-        <h3>Transport</h3>
-        <p>Shuttles will be provided from the Hyatt to the ceremony.</p>
-    </div>
-</section> 
- <h2>Gift Registry</h2>
-    <div class="registry-grid">
-        <div class="registry-card"><h4>Massy Stores</h4><p>Home & Kitchen</p><button style='padding:5px 15px;'>VIEW</button></div>
-        <div class="registry-card"><h4>Amazon</h4><p>Global Registry</p><button style='padding:5px 15px;'>VIEW</button></div>
-    </div>
-</section>
-<section class="container">
-    <h2>Ceremony Location</h2>
-    <div class="map-container">
-        <iframe width="100%" height="100%" frameborder="0" style="border:0" 
-            src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=Port+of+Spain,Trinidad" allowfullscreen>
-        </iframe>
-    </div>
-</section> 
- <section class="container" style='text-align:center;'>
+
+<section class="container" style='text-align:center;'>
     <h2>Share the Vibe</h2>
-    <img src='/qr' style='width:150px; border:5px solid var(--gold); border-radius:10px;'><br>
+    <img src='/qr' style='width:150px; border:5px solid #D4AF37; border-radius:10px;'><br>
     <small>Scan to share this link with other guests</small>
 </section>
-<footer><p>© 2027 Nicholas & Christine</p></footer>
+
+<div class="mobile-nav">
+    <a href="#rsvp-section">RSVP</a>
+    <a href="#memoryGrid">PHOTOS</a>
+    <a href="#" onclick="raiseToast()">TOAST</a>
+    <a href="/login">ADMIN</a>
+</div>
+
+<div id="confirmation" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:40px; border-radius:20px; border:5px solid #046307; z-index:4000; text-align:center;">
+    <h1>Thank You!</h1>
+    <p>We've received your RSVP.</p>
+    <button onclick="document.getElementById('confirmation').style.display='none'">CLOSE</button>
+</div>
+
+<div class="music-toggle" onclick="toggleMusic()" id="musicBtn">🎵</div>
+<audio id="bgMusic" loop><source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg"></audio>
+
+<footer><p>© 2027 Nicholas & Christine | Built by Cyrus</p></footer>
 <script src="/static/script.js"></script>
-</body></html>
-
-
-
-
-
+</body>
+</html>
