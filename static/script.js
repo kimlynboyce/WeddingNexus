@@ -3,6 +3,7 @@
     setInterval(() => {
         const now = new Date().getTime();
         const diff = target - now;
+        if (diff < 0) return;
         document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
         document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         document.getElementById('minutes').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -37,6 +38,21 @@ async function submitRSVP(event) {
     event.target.reset();
 }
 
+async function loadMemories() {
+    const res = await fetch('/api/memories');
+    const data = await res.json();
+    const grid = document.getElementById('memoryGrid');
+    if(grid) {
+        grid.innerHTML = data.map(m => <div class='gallery-item'><img src='\'></div>).join('');
+    }
+}
+
+async function loadToasts() {
+    const res = await fetch('/api/toasts');
+    const data = await res.json();
+    document.getElementById('toastCount').innerText = data.toasts + ' Toasts Raised';
+}
+
 function animateWave() {
     const bars = document.querySelectorAll('.bar');
     bars.forEach(bar => {
@@ -47,8 +63,18 @@ function animateWave() {
 
 window.onload = () => {
     updateCountdown();
+    loadMemories();
+    loadToasts();
     setInterval(animateWave, 150);
-    fetch('/api/toasts').then(r => r.json()).then(d => {
-        document.getElementById('toastCount').innerText = d.toasts + ' Toasts Raised';
-    });
+    
+    const photoInput = document.getElementById('photoInput');
+    if(photoInput) {
+        photoInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            await fetch('/api/upload', { method: 'POST', body: formData });
+            loadMemories();
+        });
+    }
 };
