@@ -86,6 +86,7 @@
                     <th>Name</th>
                     <th>Attendance</th>
                     <th>Meal</th>
+                    <th>Genre</th>
                     <th>Song Request</th>
                     <th>Notes</th>
                 </tr>
@@ -98,6 +99,7 @@
                         {{ 'Attending' if g[2] == 'yes' else 'Not Attending' }}
                     </td>
                     <td>{{ g[3] or '—' }}</td>
+                    <td>{{ g[6] or '—' }}</td>
                     <td>{{ g[4] or '—' }}</td>
                     <td>{{ g[5] or '—' }}</td>
                 </tr>
