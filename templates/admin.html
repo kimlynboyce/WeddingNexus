@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Hub | Nicholas & Christine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Great+Vibes&display=swap');
+        :root { --emerald: #046307; --gold: #D4AF37; --white: #FFFFFF; --camel: #C19A6B; }
+        body {
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+            background: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background: var(--emerald);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 5px solid var(--gold);
+        }
+        header h1 {
+            font-family: 'Great Vibes', cursive;
+            color: var(--gold);
+            font-size: 2.8rem;
+            margin: 0;
+        }
+        header p { color: white; margin-top: 5px; }
+        .container {
+            max-width: 95%;
+            width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+        .stat-box {
+            display: inline-block;
+            background: var(--emerald);
+            color: var(--gold);
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+        th {
+            background: var(--emerald);
+            color: var(--gold);
+        }
+        tr:hover { background: #faf5e6; }
+        .attend-yes { color: var(--emerald); font-weight: bold; }
+        .attend-no { color: #b30000; font-weight: bold; }
+        .empty-msg { padding: 20px; text-align: center; color: #888; }
+        .table-wrap { overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Admin Hub</h1>
+        <p>Nicholas & Christine — Guest Overview</p>
+    </header>
+
+    <div class="container">
+        <div class="stat-box">🥂 {{ toasts }} Toasts Raised</div>
+
+        <h2>Guest Responses ({{ guests|length }})</h2>
+        {% if guests %}
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Attendance</th>
+                    <th>Meal</th>
+                    <th>Song Request</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in guests %}
+                <tr>
+                    <td>{{ g[1] }}</td>
+                    <td class="{{ 'attend-yes' if g[2] == 'yes' else 'attend-no' }}">
+                        {{ 'Attending' if g[2] == 'yes' else 'Not Attending' }}
+                    </td>
+                    <td>{{ g[3] or '—' }}</td>
+                    <td>{{ g[4] or '—' }}</td>
+                    <td>{{ g[5] or '—' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+        <p class="empty-msg">No RSVPs yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
