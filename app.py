@@ -6,7 +6,6 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = 'wedding_secret_key'
 
-# Storage Path (Render Disk or Local)
 DB_PATH = '/opt/render/project/src/database.db' if os.environ.get('RENDER') else 'database.db'
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -22,24 +21,21 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Initialize DB at startup
 init_db()
 
 @app.route('/')
-def index(): return render_template('index.html')
+def index():
+    return render_template('index.html')
 
 @app.route('/api/rsvp', methods=['POST'])
 def rsvp():
     d = request.json
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        conn.execute("INSERT INTO guests (name, attendance, meal, song, notes) VALUES (?, ?, ?, ?, ?)", 
-                     (d.get('guest_name'), d.get('attendance'), d.get('meal'), d.get('song'), d.get('notes')))
-        conn.commit()
-        conn.close()
-        return jsonify({"success": True})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("INSERT INTO guests (name, attendance, meal, song, notes) VALUES (?, ?, ?, ?, ?)", 
+                 (d.get('guest_name'), d.get('attendance'), d.get('meal'), d.get('song'), d.get('notes')))
+    conn.commit()
+    conn.close()
+    return jsonify({"success": True})
 
 @app.route('/api/toast', methods=['POST'])
 def add_toast():
@@ -59,11 +55,11 @@ def get_toasts():
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
-    if 'file' not in request.files: return jsonify({"success": False, "error": "No file"}), 400
+    if 'file' not in request.files: return jsonify({"success": False}), 400
     file = request.files['file']
     if file.filename:
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        file.save(os.path.join(UPLOAD_FOLDER, filename))
         conn = sqlite3.connect(DB_PATH)
         conn.execute("INSERT INTO memories (filename, caption) VALUES (?, ?)", (filename, ""))
         conn.commit()
