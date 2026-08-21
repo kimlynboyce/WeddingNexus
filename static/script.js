@@ -124,3 +124,17 @@ async function loadToasts() {
 // Add to existing sequence
 const currentLoad = window.onload;
 window.onload = () => { if(currentLoad) currentLoad(); loadToasts(); };
+
+// Waveform reacts to user clicks
+document.addEventListener('mousedown', () => {
+    const bars = document.querySelectorAll('.bar');
+    bars.forEach(bar => {
+        bar.style.height = '60px';
+        bar.style.background = 'var(--emerald)';
+    });
+    setTimeout(() => {
+        bars.forEach(bar => {
+            bar.style.background = 'var(--gold)';
+        });
+    }, 300);
+});
