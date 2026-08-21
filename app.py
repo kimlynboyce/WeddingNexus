@@ -5,7 +5,7 @@ from io import BytesIO
 app = Flask(__name__)
 app.secret_key = 'wedding_secret_key'
 
-# Render settings
+# Storage Path (Render Disk or Local)
 DB_PATH = '/opt/render/project/src/database.db' if os.environ.get('RENDER') else 'database.db'
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -21,7 +21,6 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Run init at startup
 init_db()
 
 @app.route('/')
@@ -51,14 +50,13 @@ def get_toasts():
     conn = sqlite3.connect(DB_PATH)
     res = conn.execute('SELECT toasts FROM stats WHERE id = 1').fetchone()
     conn.close()
-    return jsonify({"toasts": res[0]})
+    return jsonify({"toasts": res[0] if res else 0})
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files: return "No file", 400
     file = request.files['file']
     if file.filename:
-        # Simplified path handling for reliability
         file.save(os.path.join(UPLOAD_FOLDER, file.filename))
         conn = sqlite3.connect(DB_PATH)
         conn.execute("INSERT INTO memories (filename) VALUES (?)", (file.filename,))
@@ -97,7 +95,7 @@ def admin_hub():
     guests = conn.execute("SELECT * FROM guests").fetchall()
     toasts = conn.execute('SELECT toasts FROM stats WHERE id = 1').fetchone()[0]
     conn.close()
-    return f"<html><body><h1>Wedding Hub</h1><h3>Total Toasts: {toasts}</h3><p>{str(guests)}</p></body></html>"
+    return f"<h1>Wedding Hub</h1><h3>Total Toasts: {toasts}</h3><p>{str(guests)}</p>"
 
 if __name__ == '__main__':
     app.run(debug=False, port=5000, host='0.0.0.0')
