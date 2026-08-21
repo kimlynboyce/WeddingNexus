@@ -12,7 +12,11 @@
 </header>
 <section class="hero"><div class="container">
     <div class="waveform-container" id="waveform"></div>
-    <h2>Save the Date</h2><p>May 30, 2027 • 1:00 PM • Indian Arrival Day</p>
+    <div style='text-align:center; margin:40px 0;'>
+    <button onclick='raiseToast()' id='toastBtn' style='font-size:2rem; padding:20px 40px; border-radius:100px; background:linear-gradient(var(--gold), var(--camel));'>🥂 TOAST THE COUPLE</button>
+    <p id='toastCount' style='font-weight:bold; color:var(--emerald); margin-top:10px;'>0 Toasts Raised</p>
+</div>
+<h2>Save the Date</h2><p>May 30, 2027 • 1:00 PM • Indian Arrival Day</p>
     <div id="countdown">
         <div class="time-box"><span id="days">00</span><label>Days</label></div>
         <div class="time-box"><span id="hours">00</span><label>Hours</label></div>
@@ -73,9 +77,15 @@
         </iframe>
     </div>
 </section> 
- <footer><p>© 2027 Nicholas & Christine</p></footer>
+ <section class="container" style='text-align:center;'>
+    <h2>Share the Vibe</h2>
+    <img src='/qr' style='width:150px; border:5px solid var(--gold); border-radius:10px;'><br>
+    <small>Scan to share this link with other guests</small>
+</section>
+<footer><p>© 2027 Nicholas & Christine</p></footer>
 <script src="/static/script.js"></script>
 </body></html>
+
 
 
 

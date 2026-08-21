@@ -105,3 +105,22 @@ async function loadSongs() {
 // Add to load sequence
 const oldLoad = window.onload;
 window.onload = () => { if(oldLoad) oldLoad(); loadSongs(); };
+
+async function raiseToast() {
+    const res = await fetch('/api/toast', {method:'POST'});
+    const data = await res.json();
+    document.getElementById('toastCount').innerText = data.toasts + ' Toasts Raised';
+    const btn = document.getElementById('toastBtn');
+    btn.style.transform = 'scale(1.2) rotate(5deg)';
+    setTimeout(() => btn.style.transform = 'scale(1)', 200);
+}
+async function loadToasts() {
+    try {
+        const res = await fetch('/api/toasts');
+        const data = await res.json();
+        document.getElementById('toastCount').innerText = data.toasts + ' Toasts Raised';
+    } catch(e) {}
+}
+// Add to existing sequence
+const currentLoad = window.onload;
+window.onload = () => { if(currentLoad) currentLoad(); loadToasts(); };
