@@ -81,13 +81,28 @@ def get_songs():
     conn.close()
     return jsonify([{"name": s[0], "song": s[1]} for s in songs])
 
-@app.route('/qr')
-def get_qr():
-    img = qrcode.make("https://weddingnexus.onrender.com")
-    buf = BytesIO()
-    img.save(buf)
-    buf.seek(0)
-    return send_file(buf, mimetype='image/png')
+<section class="container qr-section">
+    <h2>Share the Vibe</h2>
+    <img src='/qr' class='qr-code-img'>
+    <br>
+    <small class='qr-text'>Scan to share this link</small>
+</section>
+
+<style>
+    /* This part tells the browser: "If the screen is a phone, hide the QR stuff" */
+    @media (max-width: 600px) {
+        .qr-section {
+            display: none !important;
+        }
+    }
+
+    /* This part makes it look nice on a computer */
+    .qr-code-img {
+        width: 150px;
+        border: 5px solid #D4AF37;
+        border-radius: 10px;
+    }
+</style>
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
