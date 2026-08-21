@@ -1,6 +1,7 @@
 ﻿from flask import Flask, render_template, request, jsonify, send_file, session
 import sqlite3, os, qrcode, io
 from io import BytesIO
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = 'wedding_secret_key'
@@ -14,13 +15,14 @@ def init_db():
     if not os.path.exists(UPLOAD_FOLDER): os.makedirs(UPLOAD_FOLDER)
     conn = sqlite3.connect(DB_PATH)
     conn.execute('CREATE TABLE IF NOT EXISTS guests (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, attendance TEXT, meal TEXT, song TEXT, notes TEXT)')
-    conn.execute('CREATE TABLE IF NOT EXISTS memories (id INTEGER PRIMARY KEY AUTOINCREMENT, filename TEXT)')
+    conn.execute('CREATE TABLE IF NOT EXISTS memories (id INTEGER PRIMARY KEY AUTOINCREMENT, filename TEXT, caption TEXT)')
     conn.execute('CREATE TABLE IF NOT EXISTS stats (id INTEGER PRIMARY KEY, toasts INTEGER DEFAULT 0)')
     if not conn.execute('SELECT * FROM stats').fetchone(): 
         conn.execute('INSERT INTO stats (id, toasts) VALUES (1, 0)')
     conn.commit()
     conn.close()
 
+# Initialize DB at startup
 init_db()
 
 @app.route('/')
@@ -29,12 +31,15 @@ def index(): return render_template('index.html')
 @app.route('/api/rsvp', methods=['POST'])
 def rsvp():
     d = request.json
-    conn = sqlite3.connect(DB_PATH)
-    conn.execute("INSERT INTO guests (name, attendance, meal, song, notes) VALUES (?, ?, ?, ?, ?)", 
-                 (d.get('guest_name'), d.get('attendance'), d.get('meal'), d.get('song'), d.get('notes')))
-    conn.commit()
-    conn.close()
-    return jsonify({"success": True})
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute("INSERT INTO guests (name, attendance, meal, song, notes) VALUES (?, ?, ?, ?, ?)", 
+                     (d.get('guest_name'), d.get('attendance'), d.get('meal'), d.get('song'), d.get('notes')))
+        conn.commit()
+        conn.close()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/toast', methods=['POST'])
 def add_toast():
@@ -54,12 +59,13 @@ def get_toasts():
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
-    if 'file' not in request.files: return "No file", 400
+    if 'file' not in request.files: return jsonify({"success": False, "error": "No file"}), 400
     file = request.files['file']
     if file.filename:
-        file.save(os.path.join(UPLOAD_FOLDER, file.filename))
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         conn = sqlite3.connect(DB_PATH)
-        conn.execute("INSERT INTO memories (filename) VALUES (?)", (file.filename,))
+        conn.execute("INSERT INTO memories (filename, caption) VALUES (?, ?)", (filename, ""))
         conn.commit()
         conn.close()
     return jsonify({"success": True})
@@ -95,7 +101,7 @@ def admin_hub():
     guests = conn.execute("SELECT * FROM guests").fetchall()
     toasts = conn.execute('SELECT toasts FROM stats WHERE id = 1').fetchone()[0]
     conn.close()
-    return f"<h1>Wedding Hub</h1><h3>Total Toasts: {toasts}</h3><p>{str(guests)}</p>"
+    return render_template('admin.html', guests=guests, toasts=toasts)
 
 if __name__ == '__main__':
-    app.run(debug=False, port=5000, host='0.0.0.0')
+    app.run(debug=False, port=5000)

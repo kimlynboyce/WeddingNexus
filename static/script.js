@@ -1,13 +1,34 @@
 ﻿function updateCountdown() {
-    const target = new Date('2027-05-30T13:00:00').getTime();
-    setInterval(() => {
+    const targetDate = '2027-05-30T13:00:00';
+    const target = new Date(targetDate).getTime();
+
+    const interval = setInterval(() => {
         const now = new Date().getTime();
         const diff = target - now;
-        if (isNaN(diff) || diff < 0) return;
-        document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
-        document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        document.getElementById('minutes').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        document.getElementById('seconds').innerText = Math.floor((diff % (1000 * 60)) / 1000);
+
+        if (isNaN(diff) || diff < 0) {
+            if (document.getElementById('days')) {
+                document.getElementById('days').innerText = "00";
+                document.getElementById('hours').innerText = "00";
+                document.getElementById('minutes').innerText = "00";
+                document.getElementById('seconds').innerText = "00";
+            }
+            clearInterval(interval);
+            return;
+        }
+
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        const ids = ['days', 'hours', 'minutes', 'seconds'];
+        const values = [d, h, m, s];
+
+        ids.forEach((id, idx) => {
+            const el = document.getElementById(id);
+            if(el) el.innerText = values[idx].toString().padStart(2, '0');
+        });
     }, 1000);
 }
 
@@ -15,52 +36,99 @@ let musicPlaying = false;
 function toggleMusic() {
     const audio = document.getElementById('bgMusic');
     const btn = document.getElementById('musicBtn');
-    if(!musicPlaying) { 
+    if(!audio || !btn) return;
+
+    if(!musicPlaying) {
         audio.play().then(() => {
             btn.innerText = '⏸';
             musicPlaying = true;
-        }).catch(e => alert("Interact with the page first to enable audio."));
+        }).catch(err => {
+            console.log("Audio play failed:", err);
+            alert("Please interact with the page (click anywhere) then try playing music again.");
+        });
     } else { 
-        audio.pause(); btn.innerText = '🎵'; musicPlaying = false; 
+        audio.pause();
+        btn.innerText = '🎵';
+        musicPlaying = false;
     }
 }
 
 async function raiseToast() {
-    const res = await fetch('/api/toast', {method:'POST'});
-    const data = await res.json();
-    document.getElementById('toastCount').innerText = data.toasts + ' Toasts Raised';
+    try {
+        const res = await fetch('/api/toast', {method:'POST'});
+        const data = await res.json();
+        const el = document.getElementById('toastCount');
+        if(el) el.innerText = (data.toasts || 0) + ' Toasts Raised';
+    } catch(e) { console.error('Toast error:', e); }
 }
 
 async function submitRSVP(event) {
     event.preventDefault();
-    const data = Object.fromEntries(new FormData(event.target).entries());
-    await fetch('/api/rsvp', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(data)
-    });
-    document.getElementById('confirmation').style.display = 'block';
-    event.target.reset();
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries());
+    try {
+        const res = await fetch('/api/rsvp', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        if(res.ok) {
+            const conf = document.getElementById('confirmation');
+            if(conf) conf.style.display = 'block';
+            event.target.reset();
+        }
+    } catch(e) { console.error('RSVP error:', e); }
 }
 
 async function loadMemories() {
-    const res = await fetch('/api/memories');
-    const data = await res.json();
-    const grid = document.getElementById('memoryGrid');
-    if(grid) grid.innerHTML = data.map(m => \<div class='gallery-item'><img src='/static/uploads/\'></div>\).join('');
+    try {
+        const res = await fetch('/api/memories');
+        const data = await res.json();
+        const grid = document.getElementById('memoryGrid');
+        if(grid && Array.isArray(data)) {
+            grid.innerHTML = data.map(m => `
+                <div class='gallery-item'>
+                    <img src='/static/uploads/${m.filename}' onerror="this.src='https://via.placeholder.com/200?text=Image+Error'">
+                </div>
+            `).join('');
+        }
+    } catch(e) { console.error('Memory load error:', e); }
+}
+
+async function loadToasts() {
+    try {
+        const res = await fetch('/api/toasts');
+        const data = await res.json();
+        const el = document.getElementById('toastCount');
+        if(el) el.innerText = (data.toasts || 0) + ' Toasts Raised';
+    } catch(e) {}
+}
+
+function animateWave() {
+    const bars = document.querySelectorAll('.bar');
+    if(!bars.length) return;
+    bars.forEach(bar => {
+        const h = 10 + Math.random() * 40;
+        bar.style.height = h + 'px';
+    });
 }
 
 window.onload = () => {
     updateCountdown();
     loadMemories();
-    fetch('/api/toasts').then(r => r.json()).then(d => {
-        document.getElementById('toastCount').innerText = d.toasts + ' Toasts Raised';
-    });
-    const input = document.getElementById('photoInput');
-    if(input) input.onchange = async (e) => {
-        const fd = new FormData();
-        fd.append('file', e.target.files[0]);
-        await fetch('/api/upload', {method:'POST', body:fd});
-        loadMemories();
-    };
+    loadToasts();
+    setInterval(animateWave, 150);
+
+    const photoInput = document.getElementById('photoInput');
+    if(photoInput) {
+        photoInput.onchange = async (e) => {
+            if(!e.target.files[0]) return;
+            const formData = new FormData();
+            formData.append('file', e.target.files[0]);
+            try {
+                const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                if(res.ok) loadMemories();
+            } catch(err) { console.error('Upload error:', err); }
+        };
+    }
 };
