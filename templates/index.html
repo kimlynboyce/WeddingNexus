@@ -105,17 +105,35 @@
 <audio id="bgMusic" loop preload="auto"><source src="https://stream.radio.co/s9f46a9bb1/listen?ver=539744" type="audio/mpeg"></audio>
 
 <script>
-    function startTimer() {
-        const target = new Date(2027, 4, 30, 13, 0, 0).getTime();
-        setInterval(() => {
+        function startTimer() {
+        const targetDate = new Date(2027, 4, 30, 13, 0, 0); // May 30, 2027, 1:00 PM
+        const target = targetDate.getTime();
+        
+        function update() {
             const now = new Date().getTime();
             const diff = target - now;
-            if (isNaN(diff) || diff < 0) return;
-            document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-            document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
-            document.getElementById('minutes').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-            document.getElementById('seconds').innerText = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
-        }, 1000);
+            
+            if (isNaN(diff) || diff < 0) {
+                document.getElementById('days').innerText = '00';
+                document.getElementById('hours').innerText = '00';
+                document.getElementById('minutes').innerText = '00';
+                document.getElementById('seconds').innerText = '00';
+                return;
+            }
+            
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').innerText = d.toString().padStart(2, '0');
+            document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+        }
+        
+        update(); // Initial call
+        setInterval(update, 1000);
     }
 
     let playing = false;
@@ -172,3 +190,4 @@
 </script>
 </body>
 </html>
+
