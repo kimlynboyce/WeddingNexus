@@ -85,9 +85,9 @@
 <audio id="bgMusic" loop><source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg"></audio>
 
 <script>
-    function updateCountdown() {
-        const target = new Date(2027, 4, 30, 13, 0, 0).getTime();
-        setInterval(() => {
+    function startTimer() {
+        const target = new Date('May 30, 2027 13:00:00').getTime();
+        console.log('Timer Node Active'); setInterval(() => {
             const now = new Date().getTime();
             const diff = target - now;
             if (isNaN(diff) || diff < 0) return;
@@ -136,7 +136,7 @@
     }
 
     window.onload = () => {
-        updateCountdown(); loadMemories(); loadSongs();
+        startTimer(); loadMemories(); loadSongs();
         fetch('/api/toasts').then(r => r.json()).then(d => document.getElementById('toastCount').innerText = d.toasts + ' Toasts Raised');
         document.getElementById('photoInput').onchange = async (e) => {
             if(!e.target.files[0]) return;
@@ -148,4 +148,5 @@
 </script>
 </body>
 </html>
+
 
