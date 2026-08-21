@@ -1,9 +1,12 @@
 ﻿function updateCountdown() {
     const target = new Date("May 30, 2027 13:00:00").getTime();
-    setInterval(() => {
+    const timer = setInterval(() => {
         const now = new Date().getTime();
         const diff = target - now;
-        if (diff < 0) return;
+        if (diff < 0) {
+            clearInterval(timer);
+            return;
+        }
         document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
         document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         document.getElementById('minutes').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -14,8 +17,14 @@
 let musicPlaying = false;
 function toggleMusic() {
     const audio = document.getElementById('bgMusic');
-    if(!musicPlaying) { audio.play(); document.getElementById('musicBtn').innerText = '⏸'; }
-    else { audio.pause(); document.getElementById('musicBtn').innerText = '🎵'; }
+    if(!musicPlaying) { 
+        audio.play().catch(e => console.log("Autoplay blocked"));
+        document.getElementById('musicBtn').innerText = '⏸'; 
+    }
+    else { 
+        audio.pause(); 
+        document.getElementById('musicBtn').innerText = '🎵'; 
+    }
     musicPlaying = !musicPlaying;
 }
 
@@ -43,7 +52,7 @@ async function loadMemories() {
     const data = await res.json();
     const grid = document.getElementById('memoryGrid');
     if(grid) {
-        grid.innerHTML = data.map(m => \<div class='gallery-item'><img src='/static/uploads/\'></div>\).join('');
+        grid.innerHTML = data.map(m => <div class='gallery-item'><img src='/static/uploads/\'></div>).join('');
     }
 }
 

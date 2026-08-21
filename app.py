@@ -1,10 +1,11 @@
 ﻿from flask import Flask, render_template, request, jsonify, send_file, session
-import sqlite3, os, subprocess, csv, io, qrcode
+import sqlite3, os, qrcode, io
 from io import BytesIO
 
 app = Flask(__name__)
 app.secret_key = 'wedding_secret_key'
-DB_PATH = 'database.db'
+# Render disk path or local
+DB_PATH = '/opt/render/project/src/database.db' if os.environ.get('RENDER') else 'database.db'
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -47,14 +48,15 @@ def get_toasts():
     return jsonify({"toasts": res[0] if res else 0})
 
 @app.route('/api/upload', methods=['POST'])
-def upload():
+def upload_file():
     if 'file' not in request.files: return "No file", 400
     file = request.files['file']
-    file.save(os.path.join(UPLOAD_FOLDER, file.filename))
-    conn = sqlite3.connect(DB_PATH)
-    conn.execute("INSERT INTO memories (filename) VALUES (?)", (file.filename,))
-    conn.commit()
-    conn.close()
+    if file:
+        file.save(os.path.join(UPLOAD_FOLDER, file.filename))
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute("INSERT INTO memories (filename) VALUES (?)", (file.filename,))
+        conn.commit()
+        conn.close()
     return jsonify({"success": True})
 
 @app.route('/api/memories')
@@ -82,13 +84,14 @@ def login():
     return render_template('login.html')
 
 @app.route('/master-hub')
-def admin():
+def admin_hub():
     if not session.get('admin'): return "UNAUTHORIZED", 401
     conn = sqlite3.connect(DB_PATH)
     guests = conn.execute("SELECT * FROM guests").fetchall()
     toasts = conn.execute('SELECT toasts FROM stats WHERE id = 1').fetchone()[0]
     conn.close()
-    return f"<h1>Admin Hub</h1><h3>Toasts: {toasts}</h3><p>{str(guests)}</p>"
+    html = f"<html><body><h1>Master Control</h1><h3>Toasts: {toasts}</h3><p>{str(guests)}</p></body></html>"
+    return html
 
 if __name__ == '__main__':
     init_db()
