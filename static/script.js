@@ -43,7 +43,7 @@ async function loadMemories() {
     const data = await res.json();
     const grid = document.getElementById('memoryGrid');
     if(grid) {
-        grid.innerHTML = data.map(m => <div class='gallery-item'><img src='\'></div>).join('');
+        grid.innerHTML = data.map(m => \<div class='gallery-item'><img src='/static/uploads/\'></div>\).join('');
     }
 }
 
