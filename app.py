@@ -1,4 +1,4 @@
-﻿from flask import Flask, render_template, request, jsonify, send_file, session
+from flask import Flask, render_template, request, jsonify, send_file, session
 import sqlite3, os, qrcode, io
 from io import BytesIO
 from werkzeug.utils import secure_filename
@@ -18,6 +18,10 @@ def init_db():
     conn.execute('CREATE TABLE IF NOT EXISTS stats (id INTEGER PRIMARY KEY, toasts INTEGER DEFAULT 0)')
     if not conn.execute('SELECT * FROM stats').fetchone(): 
         conn.execute('INSERT INTO stats (id, toasts) VALUES (1, 0)')
+    # Migration: add genre column if it doesn't exist yet (for databases created before this feature)
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(guests)").fetchall()]
+    if 'genre' not in cols:
+        conn.execute("ALTER TABLE guests ADD COLUMN genre TEXT DEFAULT ''")
     conn.commit()
     conn.close()
 
@@ -31,8 +35,8 @@ def rsvp():
     d = request.json
     try:
         conn = sqlite3.connect(DB_PATH)
-        conn.execute("INSERT INTO guests (name, attendance, meal, song, notes) VALUES (?, ?, ?, ?, ?)", 
-                     (d.get('guest_name'), d.get('attendance'), d.get('meal'), d.get('song'), d.get('notes')))
+        conn.execute("INSERT INTO guests (name, attendance, meal, song, notes, genre) VALUES (?, ?, ?, ?, ?, ?)", 
+                     (d.get('guest_name'), d.get('attendance'), d.get('meal'), d.get('song'), d.get('notes'), d.get('genre')))
         conn.commit()
         conn.close()
         return jsonify({"success": True})
@@ -77,9 +81,9 @@ def get_memories():
 @app.route('/api/songs')
 def get_songs():
     conn = sqlite3.connect(DB_PATH)
-    songs = conn.execute("SELECT name, song FROM guests WHERE song != '' ORDER BY id DESC").fetchall()
+    songs = conn.execute("SELECT name, song, genre FROM guests WHERE song != '' ORDER BY id DESC").fetchall()
     conn.close()
-    return jsonify([{"name": s[0], "song": s[1]} for s in songs])
+    return jsonify([{"name": s[0], "song": s[1], "genre": s[2]} for s in songs])
 
 @app.route('/qr')
 def get_qr():
