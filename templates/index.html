@@ -86,7 +86,7 @@
 
 <script>
     function updateCountdown() {
-        const target = new Date('2027-05-30T13:00:00').getTime();
+        const target = new Date(2027, 4, 30, 13, 0, 0).getTime();
         setInterval(() => {
             const now = new Date().getTime();
             const diff = target - now;
@@ -148,3 +148,4 @@
 </script>
 </body>
 </html>
+
