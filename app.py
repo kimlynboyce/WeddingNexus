@@ -4,7 +4,8 @@ from io import BytesIO
 
 app = Flask(__name__)
 app.secret_key = 'wedding_secret_key'
-# Render disk path or local
+
+# Render settings
 DB_PATH = '/opt/render/project/src/database.db' if os.environ.get('RENDER') else 'database.db'
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -15,9 +16,13 @@ def init_db():
     conn.execute('CREATE TABLE IF NOT EXISTS guests (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, attendance TEXT, meal TEXT, song TEXT, notes TEXT)')
     conn.execute('CREATE TABLE IF NOT EXISTS memories (id INTEGER PRIMARY KEY AUTOINCREMENT, filename TEXT)')
     conn.execute('CREATE TABLE IF NOT EXISTS stats (id INTEGER PRIMARY KEY, toasts INTEGER DEFAULT 0)')
-    if not conn.execute('SELECT * FROM stats').fetchone(): conn.execute('INSERT INTO stats (id, toasts) VALUES (1, 0)')
+    if not conn.execute('SELECT * FROM stats').fetchone(): 
+        conn.execute('INSERT INTO stats (id, toasts) VALUES (1, 0)')
     conn.commit()
     conn.close()
+
+# Run init at startup
+init_db()
 
 @app.route('/')
 def index(): return render_template('index.html')
@@ -26,7 +31,8 @@ def index(): return render_template('index.html')
 def rsvp():
     d = request.json
     conn = sqlite3.connect(DB_PATH)
-    conn.execute("INSERT INTO guests (name, attendance, meal, song, notes) VALUES (?, ?, ?, ?, ?)", (d.get('guest_name'), d.get('attendance'), d.get('meal'), d.get('song'), d.get('notes')))
+    conn.execute("INSERT INTO guests (name, attendance, meal, song, notes) VALUES (?, ?, ?, ?, ?)", 
+                 (d.get('guest_name'), d.get('attendance'), d.get('meal'), d.get('song'), d.get('notes')))
     conn.commit()
     conn.close()
     return jsonify({"success": True})
@@ -45,13 +51,14 @@ def get_toasts():
     conn = sqlite3.connect(DB_PATH)
     res = conn.execute('SELECT toasts FROM stats WHERE id = 1').fetchone()
     conn.close()
-    return jsonify({"toasts": res[0] if res else 0})
+    return jsonify({"toasts": res[0]})
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files: return "No file", 400
     file = request.files['file']
-    if file:
+    if file.filename:
+        # Simplified path handling for reliability
         file.save(os.path.join(UPLOAD_FOLDER, file.filename))
         conn = sqlite3.connect(DB_PATH)
         conn.execute("INSERT INTO memories (filename) VALUES (?)", (file.filename,))
@@ -62,7 +69,7 @@ def upload_file():
 @app.route('/api/memories')
 def get_memories():
     conn = sqlite3.connect(DB_PATH)
-    mems = conn.execute("SELECT filename FROM memories").fetchall()
+    mems = conn.execute("SELECT filename FROM memories ORDER BY id DESC").fetchall()
     conn.close()
     return jsonify([{"filename": m[0]} for m in mems])
 
@@ -90,9 +97,7 @@ def admin_hub():
     guests = conn.execute("SELECT * FROM guests").fetchall()
     toasts = conn.execute('SELECT toasts FROM stats WHERE id = 1').fetchone()[0]
     conn.close()
-    html = f"<html><body><h1>Master Control</h1><h3>Toasts: {toasts}</h3><p>{str(guests)}</p></body></html>"
-    return html
+    return f"<html><body><h1>Wedding Hub</h1><h3>Total Toasts: {toasts}</h3><p>{str(guests)}</p></body></html>"
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=False, port=5000, host='0.0.0.0')
