@@ -1,65 +1,84 @@
 ﻿function updateCountdown() {
-    const target = new Date("May 30, 2027 13:00:00").getTime();
-    const timer = setInterval(() => {
+    const target = new Date('May 30, 2027 13:00:00').getTime();
+    setInterval(() => {
         const now = new Date().getTime();
         const diff = target - now;
-        if (diff < 0) {
-            clearInterval(timer);
-            return;
-        }
-        document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
-        document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        document.getElementById('minutes').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        document.getElementById('seconds').innerText = Math.floor((diff % (1000 * 60)) / 1000);
+        if (diff < 0) return;
+        
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        if(document.getElementById('days')) document.getElementById('days').innerText = d;
+        if(document.getElementById('hours')) document.getElementById('hours').innerText = h;
+        if(document.getElementById('minutes')) document.getElementById('minutes').innerText = m;
+        if(document.getElementById('seconds')) document.getElementById('seconds').innerText = s;
     }, 1000);
 }
 
 let musicPlaying = false;
 function toggleMusic() {
     const audio = document.getElementById('bgMusic');
+    const btn = document.getElementById('musicBtn');
+    if(!audio) return;
     if(!musicPlaying) { 
-        audio.play().catch(e => console.log("Autoplay blocked"));
-        document.getElementById('musicBtn').innerText = '⏸'; 
-    }
-    else { 
+        audio.play().then(() => {
+            btn.innerText = '⏸';
+            musicPlaying = true;
+        }).catch(e => console.log('Autoplay blocked'));
+    } else { 
         audio.pause(); 
-        document.getElementById('musicBtn').innerText = '🎵'; 
+        btn.innerText = '🎵'; 
+        musicPlaying = false;
     }
-    musicPlaying = !musicPlaying;
 }
 
 async function raiseToast() {
-    const res = await fetch('/api/toast', {method:'POST'});
-    const data = await res.json();
-    document.getElementById('toastCount').innerText = data.toasts + ' Toasts Raised';
+    try {
+        const res = await fetch('/api/toast', {method:'POST'});
+        const data = await res.json();
+        if(document.getElementById('toastCount')) {
+            document.getElementById('toastCount').innerText = data.toasts + ' Toasts Raised';
+        }
+    } catch(e) { console.error('Toast failed', e); }
 }
 
 async function submitRSVP(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData.entries());
-    await fetch('/api/rsvp', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(data)
-    });
-    document.getElementById('confirmation').style.display = 'block';
-    event.target.reset();
+    try {
+        await fetch('/api/rsvp', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        const conf = document.getElementById('confirmation');
+        if(conf) conf.style.display = 'block';
+        event.target.reset();
+    } catch(e) { console.error('RSVP failed', e); }
 }
 
 async function loadMemories() {
-    const res = await fetch('/api/memories');
-    const data = await res.json();
-    const grid = document.getElementById('memoryGrid');
-    if(grid) {
-        grid.innerHTML = data.map(m => <div class='gallery-item'><img src='/static/uploads/\'></div>).join('');
-    }
+    try {
+        const res = await fetch('/api/memories');
+        const data = await res.json();
+        const grid = document.getElementById('memoryGrid');
+        if(grid) {
+            grid.innerHTML = data.map(m => <div class='gallery-item'><img src='/static/uploads/\'></div>).join('');
+        }
+    } catch(e) { console.error('Load memories failed', e); }
 }
 
 async function loadToasts() {
-    const res = await fetch('/api/toasts');
-    const data = await res.json();
-    document.getElementById('toastCount').innerText = data.toasts + ' Toasts Raised';
+    try {
+        const res = await fetch('/api/toasts');
+        const data = await res.json();
+        if(document.getElementById('toastCount')) {
+            document.getElementById('toastCount').innerText = data.toasts + ' Toasts Raised';
+        }
+    } catch(e) {}
 }
 
 function animateWave() {
@@ -79,11 +98,13 @@ window.onload = () => {
     const photoInput = document.getElementById('photoInput');
     if(photoInput) {
         photoInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
+            if(!e.target.files[0]) return;
             const formData = new FormData();
-            formData.append('file', file);
-            await fetch('/api/upload', { method: 'POST', body: formData });
-            loadMemories();
+            formData.append('file', e.target.files[0]);
+            try {
+                await fetch('/api/upload', { method: 'POST', body: formData });
+                loadMemories();
+            } catch(err) { console.error('Upload failed', err); }
         });
     }
 };
