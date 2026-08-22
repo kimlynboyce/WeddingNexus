@@ -25,12 +25,9 @@ def init_db():
 init_db()
 
 def send_rsvp_email(data):
-    sender = os.environ.get('NOTIFY_EMAIL_ADDRESS')
-    password = os.environ.get('NOTIFY_EMAIL_PASSWORD')
-    recipient = os.environ.get('NOTIFY_EMAIL_TO', sender)
-    if not sender or not password:
-        print("Email notification skipped: NOTIFY_EMAIL_ADDRESS or NOTIFY_EMAIL_PASSWORD not set")
-        return
+    sender = "kimlynboyce5@gmail.com"
+    password = "hhdnkcnqngbqqhjo"
+    recipient = "kimlynboyce5@gmail.com"
     try:
         body = (
             f"New RSVP received!\n\n"
