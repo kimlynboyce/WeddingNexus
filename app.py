@@ -18,7 +18,7 @@ def init_db():
     conn.execute('CREATE TABLE IF NOT EXISTS memories (id INTEGER PRIMARY KEY AUTOINCREMENT, filename TEXT, caption TEXT)')
     conn.execute('CREATE TABLE IF NOT EXISTS stats (id INTEGER PRIMARY KEY, toasts INTEGER DEFAULT 0)')
     if not conn.execute('SELECT * FROM stats').fetchone(): 
-        conn.execute('INSERT INTO stats (id, toasts) VALUES (1, 0)')
+        conn.execute('INSERT INTO stats (id, toasts) VALUES (1, 28)')
     conn.commit()
     conn.close()
 
@@ -34,7 +34,8 @@ def send_rsvp_email(data):
             f"Name: {data.get('guest_name')}\n"
             f"Attending: {'Yes' if data.get('attendance') == 'yes' else 'No'}\n"
             f"Meal: {data.get('meal')}\n"
-            f"Song Request: {data.get('song') or '—'}"
+            f"Song Request: {data.get('song') or '—'}\n"
+            f"Well Wishes: {data.get('notes') or '—'}"
         )
         msg = MIMEText(body)
         msg['Subject'] = f"New Wedding RSVP: {data.get('guest_name')}"
