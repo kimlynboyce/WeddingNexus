@@ -65,7 +65,7 @@
 
 <section class="container">
     <button onclick='raiseToast()' id='toastBtn'>🥂 TOAST THE COUPLE</button>
-    <p id='toastCount' style='font-weight:bold; color:var(--emerald); margin-top:10px;'>0 Toasts Raised</p>
+    <p id='toastCount' style='font-weight:bold; color:var(--emerald); margin-top:10px;'>28 Toasts Raised</p>
     <p id='musicStatus' style='font-size:0.8rem; color:#999; margin-top:-5px;'>🎵 Toast to start the music</p>
     <div id="countdown" style="display:flex; justify-content:center; margin-top:20px; flex-wrap: wrap;">
         <div class="time-box"><span id="days">00</span>DAYS</div>
@@ -143,6 +143,7 @@
         }, 1000);
     }
 
+    let toastTotal = 28;
     let playing = false;
     async function startMusicIfNeeded() {
         if (playing) return;
@@ -160,9 +161,9 @@
 
     async function raiseToast() {
         startMusicIfNeeded();
-        const r = await fetch('/api/toast', {method:'POST'});
-        const d = await r.json();
-        document.getElementById('toastCount').innerText = d.toasts + ' Toasts Raised';
+        toastTotal++;
+        document.getElementById('toastCount').innerText = toastTotal + ' Toasts Raised';
+        fetch('/api/toast', {method:'POST'}).catch(() => {});
     }
 
     async function submitRSVP(e) {
@@ -203,7 +204,7 @@
             const cx = 15 + Math.random() * 70;
             const cy = 10 + Math.random() * 45;
             setTimeout(() => {
-                const particleCount =28;
+                const particleCount = 28;
                 for (let i = 0; i < particleCount; i++) {
                     const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.2;
                     const distance = 80 + Math.random() * 80;
@@ -243,7 +244,6 @@
 
     window.onload = () => {
         startTimer(); loadMemories(); loadSongs();
-        fetch('/api/toasts').then(r => r.json()).then(d => document.getElementById('toastCount').innerText = d.toasts + ' Toasts Raised');
         document.getElementById('photoInput').onchange = async (e) => {
             if(!e.target.files[0]) return;
             const fd = new FormData(); fd.append('file', e.target.files[0]);
