@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, send_file, session
-import sqlite3, os, qrcode, io
+import sqlite3, os, qrcode, io, smtplib
 from io import BytesIO
+from email.mime.text import MIMEText
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -23,6 +24,31 @@ def init_db():
 
 init_db()
 
+def send_rsvp_email(data):
+    sender = os.environ.get('NOTIFY_EMAIL_ADDRESS')
+    password = os.environ.get('NOTIFY_EMAIL_PASSWORD')
+    recipient = os.environ.get('NOTIFY_EMAIL_TO', sender)
+    if not sender or not password:
+        print("Email notification skipped: NOTIFY_EMAIL_ADDRESS or NOTIFY_EMAIL_PASSWORD not set")
+        return
+    try:
+        body = (
+            f"New RSVP received!\n\n"
+            f"Name: {data.get('guest_name')}\n"
+            f"Attending: {'Yes' if data.get('attendance') == 'yes' else 'No'}\n"
+            f"Meal: {data.get('meal')}\n"
+            f"Song Request: {data.get('song') or '—'}"
+        )
+        msg = MIMEText(body)
+        msg['Subject'] = f"New Wedding RSVP: {data.get('guest_name')}"
+        msg['From'] = sender
+        msg['To'] = recipient
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(sender, password)
+            server.sendmail(sender, recipient, msg.as_string())
+    except Exception as e:
+        print("Email notification failed:", e)
+
 @app.route('/')
 def index(): return render_template('index.html')
 
@@ -35,6 +61,7 @@ def rsvp():
                      (d.get('guest_name'), d.get('attendance'), d.get('meal'), d.get('song'), d.get('notes')))
         conn.commit()
         conn.close()
+        send_rsvp_email(d)
         return jsonify({"success": True})
     except: return jsonify({"success": False}), 500
 
