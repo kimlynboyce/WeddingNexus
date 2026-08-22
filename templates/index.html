@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
-        :root { --emerald: #046307; --gold: #D4AF37; --white: #FFFFFF; --camel: #C19A6B; }
+        :root { --emerald: #046A38; --gold: #D4AF37; --white: #FFFFFF; --camel: #C19A6B; }
         body { margin: 0; font-family: 'Playfair Display', serif; background: var(--white); background-image: url('https://img.magnific.com/premium-vector/wedding-background-with-hand-drawn-floral-ornaments_1215-320.jpg?w=900'); background-size: cover; background-attachment: fixed; background-position: center; color: #333; overflow-x: hidden; padding-bottom: 80px; }
         .container { max-width: 95%; width: 800px; margin: 20px auto; padding: 20px; background: rgba(255,255,255,0.95); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; }
         header { background: var(--emerald); padding: 40px 20px; text-align: center; border-bottom: 5px solid var(--gold); }
@@ -52,8 +52,8 @@
         @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0.3; } }
         .flash-overlay { position: fixed; inset: 0; background: white; opacity: 0; pointer-events: none; z-index: 5001; animation: flashPulse 4s ease-out forwards; }
         @keyframes flashPulse { 0% { opacity: 0.85; } 15% { opacity: 0; } 30% { opacity: 0.5; } 45% { opacity: 0; } 100% { opacity: 0; } }
-        .sparkle { position: absolute; font-size: 1.5rem; animation: sparklePop 1.2s ease-out forwards; }
-        @keyframes sparklePop { 0% { transform: scale(0) rotate(0deg); opacity: 0; } 50% { transform: scale(1.3) rotate(180deg); opacity: 1; } 100% { transform: scale(0.8) rotate(360deg); opacity: 0; } }
+        .sparkle { position: absolute; width: 6px; height: 6px; border-radius: 50%; animation: fireworkBurst 1.1s ease-out forwards; }
+        @keyframes fireworkBurst { to { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; } }
         #thankYouToast { display: none; position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--emerald); color: var(--gold); padding: 15px 25px; border-radius: 30px; font-weight: bold; z-index: 6000; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
         @media (max-width: 600px) {
             .qr-section { display: none !important; }
@@ -100,11 +100,11 @@
     <form onsubmit="submitRSVP(event)" style="text-align:left; max-width:400px; margin:20px auto;">
         <input type="text" name="guest_name" required placeholder="Your Name" style="width:100%; padding:12px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;"><br>
         <select name="attendance" style="width:100%; padding:12px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;"><option value="yes">Accepts with Pleasure</option><option value="no">Declines with Regret</option></select><br>
-        <input type="hidden" name="genre" id="chosenGenre">
-        <input type="hidden" name="song" id="chosenSong">
-        <button type="button" onclick="openWheelModal()" style="width:100%; background:white; color:var(--emerald); border:2px dashed var(--gold); margin-bottom:10px;">
-            🎡 <span id="songSelectionLabel">Spin for a Song Genre</span>
-        </button>
+        <select name="meal" style="width:100%; padding:12px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;">
+            <option value="meat">Meat</option>
+            <option value="vegetarian">Vegetarian</option>
+        </select><br>
+        <input type="text" name="song" placeholder="Song Request" style="width:100%; padding:12px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;"><br>
         <button type="submit" style="width:100%;">SUBMIT RSVP</button>
     </form>
 </section>
@@ -114,34 +114,6 @@
     <img src='/qr' style='width:150px; border:5px solid var(--gold); border-radius:10px;'><br>
     <small>Scan to share this link</small>
 </section>
-
-<div id="wheelModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center;">
-  <div style="background:white; border-radius:20px; padding:30px 20px; max-width:400px; width:90%; text-align:center; box-sizing:border-box;">
-    <h2 style="color:var(--emerald); margin-top:0;">Spin for Your Genre!</h2>
-    <div style="position:relative; width:260px; height:260px; margin:20px auto;">
-      <div style="position:absolute; top:-15px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:12px solid transparent; border-right:12px solid transparent; border-top:20px solid var(--emerald); z-index:10;"></div>
-      <div id="wheel" style="width:100%; height:100%; border-radius:50%; border:5px solid var(--gold); position:relative; transition: transform 4s cubic-bezier(0.17, 0.67, 0.32, 1.00); background: conic-gradient(var(--emerald) 0deg 45deg, var(--gold) 45deg 90deg, var(--emerald) 90deg 135deg, var(--gold) 135deg 180deg, var(--emerald) 180deg 225deg, var(--gold) 225deg 270deg, var(--emerald) 270deg 315deg, var(--gold) 315deg 360deg);">
-        <div style="position:absolute; top:50%; left:50%; width:0; height:0; transform: rotate(22.5deg);"><span style="position:absolute; left:-30px; top:-95px; width:60px; display:inline-block; font-size:0.75rem; font-weight:bold; color:white;">Dance</span></div>
-        <div style="position:absolute; top:50%; left:50%; width:0; height:0; transform: rotate(67.5deg);"><span style="position:absolute; left:-30px; top:-95px; width:60px; display:inline-block; font-size:0.75rem; font-weight:bold; color:var(--emerald);">Pop</span></div>
-        <div style="position:absolute; top:50%; left:50%; width:0; height:0; transform: rotate(112.5deg);"><span style="position:absolute; left:-30px; top:-95px; width:60px; display:inline-block; font-size:0.75rem; font-weight:bold; color:white;">Chutney</span></div>
-        <div style="position:absolute; top:50%; left:50%; width:0; height:0; transform: rotate(157.5deg);"><span style="position:absolute; left:-30px; top:-95px; width:60px; display:inline-block; font-size:0.75rem; font-weight:bold; color:var(--emerald);">Soca</span></div>
-        <div style="position:absolute; top:50%; left:50%; width:0; height:0; transform: rotate(202.5deg);"><span style="position:absolute; left:-30px; top:-95px; width:60px; display:inline-block; font-size:0.75rem; font-weight:bold; color:white;">Dancehall</span></div>
-        <div style="position:absolute; top:50%; left:50%; width:0; height:0; transform: rotate(247.5deg);"><span style="position:absolute; left:-30px; top:-95px; width:60px; display:inline-block; font-size:0.75rem; font-weight:bold; color:var(--emerald);">Rock</span></div>
-        <div style="position:absolute; top:50%; left:50%; width:0; height:0; transform: rotate(292.5deg);"><span style="position:absolute; left:-30px; top:-95px; width:60px; display:inline-block; font-size:0.75rem; font-weight:bold; color:white;">Latin</span></div>
-        <div style="position:absolute; top:50%; left:50%; width:0; height:0; transform: rotate(337.5deg);"><span style="position:absolute; left:-30px; top:-95px; width:60px; display:inline-block; font-size:0.75rem; font-weight:bold; color:var(--emerald);">Throwback</span></div>
-      </div>
-    </div>
-    <button id="spinBtn" onclick="spinWheel()" style="margin-bottom:10px;">SPIN THE WHEEL</button>
-    <div id="genreResult" style="display:none; margin-top:15px;">
-        <p style="font-weight:bold; color:var(--emerald); font-size:1.2rem;">You got: <span id="resultGenreText"></span>!</p>
-        <input type="hidden" id="chosenGenreTemp">
-        <input type="text" id="songInput" placeholder="Type a song from this genre" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ccc; box-sizing:border-box; margin-bottom:10px;">
-        <button onclick="confirmSong()">CONFIRM</button>
-    </div>
-    <br>
-    <a href="#" onclick="closeWheelModal(); return false;" style="display:inline-block; margin-top:10px; color:#999; font-size:0.85rem;">Cancel</a>
-  </div>
-</div>
 
 <div id="celebrationOverlay"></div>
 <div id="thankYouToast">Thank you! RSVP recorded 🎉</div>
@@ -200,7 +172,6 @@
         toast.style.display = 'block';
         setTimeout(() => { toast.style.display = 'none'; }, 3000);
         e.target.reset();
-        document.getElementById('songSelectionLabel').innerText = 'Spin for a Song Genre';
         loadSongs();
     }
 
@@ -213,8 +184,9 @@
         flash.className = 'flash-overlay';
         overlay.appendChild(flash);
 
-        const colors = ['#D4AF37', '#046307', '#C19A6B', '#FFFFFF'];
-        for (let i = 0; i < 60; i++) {
+        const colors = ['#D4AF37', '#046307', '#C19A6B', '#FFFFFF', '#FFD700'];
+
+        for (let i = 0; i < 70; i++) {
             const c = document.createElement('div');
             c.className = 'confetti-piece';
             c.style.left = Math.random() * 100 + 'vw';
@@ -224,15 +196,27 @@
             overlay.appendChild(c);
         }
 
-        const emojis = ['✨', '🎆', '🎇'];
-        for (let i = 0; i < 20; i++) {
-            const s = document.createElement('div');
-            s.className = 'sparkle';
-            s.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-            s.style.left = Math.random() * 100 + 'vw';
-            s.style.top = Math.random() * 80 + 'vh';
-            s.style.animationDelay = (Math.random() * 1.5) + 's';
-            overlay.appendChild(s);
+        const burstCount = 5;
+        for (let b = 0; b < burstCount; b++) {
+            const cx = 15 + Math.random() * 70;
+            const cy = 10 + Math.random() * 45;
+            setTimeout(() => {
+                const particleCount = 28;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.2;
+                    const distance = 80 + Math.random() * 80;
+                    const dx = Math.cos(angle) * distance;
+                    const dy = Math.sin(angle) * distance;
+                    const p = document.createElement('div');
+                    p.className = 'sparkle';
+                    p.style.left = cx + 'vw';
+                    p.style.top = cy + 'vh';
+                    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    p.style.setProperty('--dx', dx + 'px');
+                    p.style.setProperty('--dy', dy + 'px');
+                    overlay.appendChild(p);
+                }
+            }, b * 400);
         }
 
         setTimeout(() => {
@@ -252,50 +236,7 @@
         const r = await fetch('/api/songs');
         const d = await r.json();
         const f = document.getElementById('songFeed');
-        if(f) f.innerHTML = d.map(s => `<div style='background:var(--camel); color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem;'><b>${s.song}</b> (${s.name})${s.genre ? ' · ' + s.genre : ''}</div>`).join('');
-    }
-
-    const wheelGenres = ['Dance','Pop','Chutney','Soca','Dancehall','Rock','Latin','Throwback'];
-    let wheelRotation = 0;
-
-    function openWheelModal() {
-        document.getElementById('wheelModal').style.display = 'flex';
-        document.getElementById('genreResult').style.display = 'none';
-        document.getElementById('spinBtn').style.display = 'inline-block';
-        document.getElementById('spinBtn').disabled = false;
-        document.getElementById('songInput').value = '';
-    }
-
-    function closeWheelModal() {
-        document.getElementById('wheelModal').style.display = 'none';
-    }
-
-    function spinWheel() {
-        const spinBtn = document.getElementById('spinBtn');
-        spinBtn.disabled = true;
-        const chosenIndex = Math.floor(Math.random() * wheelGenres.length);
-        const segmentAngle = 360 / wheelGenres.length;
-        const centerAngle = chosenIndex * segmentAngle + segmentAngle / 2;
-        const extraSpins = 5 * 360;
-        wheelRotation += extraSpins + (360 - centerAngle);
-        document.getElementById('wheel').style.transform = `rotate(${wheelRotation}deg)`;
-
-        setTimeout(() => {
-            document.getElementById('resultGenreText').innerText = wheelGenres[chosenIndex];
-            document.getElementById('chosenGenreTemp').value = wheelGenres[chosenIndex];
-            document.getElementById('genreResult').style.display = 'block';
-            spinBtn.style.display = 'none';
-        }, 4200);
-    }
-
-    function confirmSong() {
-        const genre = document.getElementById('chosenGenreTemp').value;
-        const song = document.getElementById('songInput').value.trim();
-        if (!song) { alert('Please type a song!'); return; }
-        document.getElementById('chosenGenre').value = genre;
-        document.getElementById('chosenSong').value = song;
-        document.getElementById('songSelectionLabel').innerText = genre + ': ' + song;
-        closeWheelModal();
+        if(f) f.innerHTML = d.map(s => `<div style='background:var(--camel); color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem;'><b>${s.song}</b> (${s.name})</div>`).join('');
     }
 
     window.onload = () => {
